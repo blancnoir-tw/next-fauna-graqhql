@@ -45,6 +45,23 @@ const Home = () => {
     }
   }
 
+  const deleteTodo = async (id: string) => {
+    const query = gql`
+      mutation DeleteTodo($id: ID!) {
+        deleteTodo(id: $id) {
+          _id
+        }
+      }
+    `
+
+    try {
+      await graphQLClient.request(query, { id })
+      mutate()
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
   if (error) return <div>failed to load</div>
 
   return (
@@ -67,6 +84,9 @@ const Home = () => {
                 <Link href="/todo/[id]" as={`/todo/${todo._id}`}>
                   <a>Edit</a>
                 </Link>
+              </span>
+              <span onClick={() => deleteTodo(todo._id)} className={styles.delete}>
+                Delete
               </span>
             </li>
           ))}
