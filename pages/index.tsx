@@ -10,7 +10,7 @@ import styles from '../styles/home.module.css'
 const fetcher = async (query: string) => await graphQLClient.request(query)
 
 const Home = () => {
-  const { data, error } = useSWR<AllTodos, Error>(
+  const { data, error, mutate } = useSWR<AllTodos, Error>(
     gql`
       {
         allTodos {
@@ -25,6 +25,26 @@ const Home = () => {
     fetcher
   )
 
+  const toggleTodo = async (id: string, completed: boolean) => {
+    const query = gql`
+      mutation PartialUpdateTodo($id: ID!, $completed: Boolean!) {
+        partialUpdateTodo(id: $id, data: { completed: $completed }) {
+          _id
+          completed
+        }
+      }
+    `
+
+    const variables = { id, completed: !completed }
+
+    try {
+      await graphQLClient.request(query, variables)
+      mutate()
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
   if (error) return <div>failed to load</div>
 
   return (
@@ -37,7 +57,17 @@ const Home = () => {
         <ul>
           {data.allTodos.data.map(todo => (
             <li key={todo._id} className={styles.todo}>
-              <span>{todo.task}</span>
+              <span
+                onClick={() => toggleTodo(todo._id, todo.completed)}
+                style={todo.completed ? { textDecoration: 'line-through' } : { textDecoration: 'none' }}
+              >
+                {todo.task}
+              </span>
+              <span className={styles.edit}>
+                <Link href="/todo/[id]" as={`/todo/${todo._id}`}>
+                  <a>Edit</a>
+                </Link>
+              </span>
             </li>
           ))}
         </ul>
