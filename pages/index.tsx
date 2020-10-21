@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import useSWR from 'swr'
 import { gql } from 'graphql-request'
 
@@ -29,6 +30,9 @@ const Home = () => {
   return (
     <Layout>
       <h1>Next Fauna GraphQL</h1>
+      <Link href="/new">
+        <a className={styles.link}>Create New Todo</a>
+      </Link>
       {data ? (
         <ul>
           {data.allTodos.data.map(todo => (
