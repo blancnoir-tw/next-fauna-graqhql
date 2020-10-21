@@ -22,8 +22,13 @@
 }
 
 .form input[type='checkbox'] {
-  transform: scale(2);
+  transform: scale(1.6);
   margin-left: 1rem;
+}
+
+.checkboxWrap {
+  display: flex;
+  align-items: center;
 }
 
 .submit {
@@ -39,6 +44,10 @@
   font-size: 1rem;
   padding: 0.5rem 1rem;
   cursor: pointer;
+}
+
+.submit button:focus {
+  outline-color: mediumvioletred;
 }
 
 .error,
