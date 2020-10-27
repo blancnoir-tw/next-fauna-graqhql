@@ -1,6 +1,7 @@
 import { FC, Fragment } from 'react'
 import Head from 'next/head'
 
+import Header from './header'
 import styles from './layout.module.css'
 
 const Layout: FC = ({ children }) => (
@@ -9,6 +10,8 @@ const Layout: FC = ({ children }) => (
       <title>Next Fauna GraphQL</title>
       <link rel="stylesheet" href="/favicon.ico" />
     </Head>
+
+    <Header />
 
     <main>
       <div className={styles.container}>{children}</div>
