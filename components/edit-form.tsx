@@ -10,11 +10,12 @@ import { graphQLClient } from '../utils/graphql-client'
 type Props = {
   defaultValues: FormData
   id: string
+  token: string
 }
 
 type FormData = Omit<Todo, '_id'>
 
-const EditForm = ({ defaultValues, id }: Props) => {
+const EditForm = ({ defaultValues, id, token }: Props) => {
   const [errorMessage, setErrorMessage] = useState('')
   const { handleSubmit, register, reset, errors } = useForm<FormData>({ defaultValues: { ...defaultValues } })
 
@@ -33,7 +34,7 @@ const EditForm = ({ defaultValues, id }: Props) => {
     const variables = { id, task, completed }
 
     try {
-      await graphQLClient.request(query, variables)
+      await graphQLClient().request(query, variables)
       Router.push('/')
     } catch (err) {
       console.error(err)
