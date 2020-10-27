@@ -1,15 +1,19 @@
+import { GetServerSideProps } from 'next'
 import Link from 'next/link'
 import useSWR from 'swr'
 import { gql } from 'graphql-request'
 
 import { graphQLClient } from '../utils/graphql-client'
+import { getAuthCookie } from '../utils/auth-cookies'
 import { AllTodos } from '../schema/schema'
 import Layout from '../components/layout'
 import styles from '../styles/home.module.css'
 
-const fetcher = async (query: string) => await graphQLClient.request(query)
+type Props = { token: string | null }
 
-const Home = () => {
+const Home = ({ token }: Props) => {
+  const fetcher = async (query: string) => await graphQLClient(token).request(query)
+
   const { data, error, mutate } = useSWR<AllTodos, Error>(
     gql`
       {
@@ -38,7 +42,7 @@ const Home = () => {
     const variables = { id, completed: !completed }
 
     try {
-      await graphQLClient.request(query, variables)
+      await graphQLClient(token).setHeader('X-Schema-Preview', 'partial-update-mutation').request(query, variables)
       mutate()
     } catch (err) {
       console.error(err)
@@ -55,7 +59,7 @@ const Home = () => {
     `
 
     try {
-      await graphQLClient.request(query, { id })
+      await graphQLClient().request(query, { id })
       mutate()
     } catch (err) {
       console.error(err)
@@ -96,6 +100,11 @@ const Home = () => {
       )}
     </Layout>
   )
+}
+
+export const getServerSideProps: GetServerSideProps = async ctx => {
+  const token = getAuthCookie(ctx.req)
+  return { props: { token: token || null } }
 }
 
 export default Home
