@@ -17,7 +17,9 @@ type FormData = Omit<Todo, '_id'>
 
 const EditForm = ({ defaultValues, id, token }: Props) => {
   const [errorMessage, setErrorMessage] = useState('')
-  const { handleSubmit, register, reset, errors } = useForm<FormData>({ defaultValues: { ...defaultValues } })
+  const { handleSubmit, register, reset, errors } = useForm<FormData>({
+    defaultValues: { ...defaultValues },
+  })
 
   const onSubmit = handleSubmit(async ({ task, completed }) => {
     if (errorMessage) setErrorMessage('')
@@ -34,7 +36,7 @@ const EditForm = ({ defaultValues, id, token }: Props) => {
     const variables = { id, task, completed }
 
     try {
-      await graphQLClient().request(query, variables)
+      await graphQLClient(token).request(query, variables)
       Router.push('/')
     } catch (err) {
       console.error(err)
@@ -51,7 +53,11 @@ const EditForm = ({ defaultValues, id, token }: Props) => {
       <form onSubmit={onSubmit} className={utilStyles.form}>
         <div>
           <label htmlFor="task">Task</label>
-          <input type="text" name="task" ref={register({ required: 'Task is required' })} />
+          <input
+            type="text"
+            name="task"
+            ref={register({ required: 'Task is required' })}
+          />
           {errors.task && (
             <span role="alert" className={utilStyles.error}>
               {errors.task.message}
