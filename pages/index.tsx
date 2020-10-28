@@ -66,7 +66,13 @@ const Home = ({ token }: Props) => {
     }
   }
 
-  if (error) return <div>failed to load</div>
+  if (error) {
+    return (
+      <Layout>
+        <div>failed to load</div>
+      </Layout>
+    )
+  }
 
   return (
     <Layout>
