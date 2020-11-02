@@ -1,9 +1,7 @@
-import { useState } from 'react'
+import { Alert, Box, Button, Heading, Input, Label, Message } from 'theme-ui'
+import { Fragment, useState } from 'react'
 import { useRouter } from 'next/router'
 import { useForm } from 'react-hook-form'
-
-import Layout from '../components/layout'
-import utilStyles from '../styles/utils.module.css'
 
 type FormData = {
   email: string
@@ -37,40 +35,32 @@ const Login = () => {
   })
 
   return (
-    <Layout>
-      <h1>Log In</h1>
-      <form onSubmit={onSubmit} className={utilStyles.form}>
-        <div>
-          <label htmlFor="email">Email</label>
-          <input type="email" name="email" ref={register({ required: 'Email is required' })} />
-          {errors.email && (
-            <span role="alert" className={utilStyles.error}>
-              {errors.email.message}
-            </span>
-          )}
-        </div>
+    <Fragment>
+      <Heading mb={3}>Login</Heading>
+      <Box as="form" onSubmit={onSubmit}>
+        <Box mb={3}>
+          <Label htmlFor="email">Email</Label>
+          <Input type="email" name="email" ref={register({ required: 'Email is required' })} />
+          {errors.email && <Alert variant="error">{errors.email.message}</Alert>}
+        </Box>
 
-        <div>
-          <label htmlFor="password">Password</label>
-          <input type="password" name="password" ref={register({ required: 'Password is required' })} />
-          {errors.password && (
-            <span role="alert" className={utilStyles.error}>
-              {errors.password.message}
-            </span>
-          )}
-        </div>
+        <Box mb={3}>
+          <Label htmlFor="password">Password</Label>
+          <Input type="password" name="password" ref={register({ required: 'Password is required' })} />
+          {errors.password && <Alert variant="error">{errors.password.message}</Alert>}
+        </Box>
 
-        <div className={utilStyles.submit}>
-          <button type="submit">Log in</button>
-        </div>
-      </form>
+        <Box sx={{ textAlign: 'right' }}>
+          <Button type="submit">Login</Button>
+        </Box>
+      </Box>
 
       {errorMessage && (
-        <p role="alert" className={utilStyles.errorMessage}>
+        <Message mt="3" variant="error">
           {errorMessage}
-        </p>
+        </Message>
       )}
-    </Layout>
+    </Fragment>
   )
 }
 

@@ -1,19 +1,23 @@
+/** @jsxRuntime classic */
+/** @jsx jsx */
+import { jsx, Heading, Message, Text, Button } from 'theme-ui'
+import { Fragment } from 'react'
 import { GetServerSideProps } from 'next'
-import Link from 'next/link'
+import { useRouter } from 'next/router'
 import useSWR from 'swr'
 import { gql } from 'graphql-request'
 
 import { graphQLClient } from '../utils/graphql-client'
 import { getAuthCookie } from '../utils/auth-cookies'
 import { AllTodos } from '../schema/schema'
-import Layout from '../components/layout'
-import styles from '../styles/home.module.css'
 
 type Props = { token: string | null }
 
 const Home = ({ token }: Props) => {
-  const fetcher = async (query: string) => await graphQLClient(token).request(query)
+  if (!token) return <Message variant="error">Please Login or Signup</Message>
 
+  const router = useRouter()
+  const fetcher = async (query: string) => await graphQLClient(token).request(query)
   const { data, error, mutate } = useSWR<AllTodos, Error>(
     gql`
       {
@@ -66,45 +70,48 @@ const Home = ({ token }: Props) => {
     }
   }
 
-  if (error) {
-    return (
-      <Layout>
-        <div>failed to load</div>
-      </Layout>
-    )
-  }
+  if (error) return <Message variant="error">failed to load</Message>
 
   return (
-    <Layout>
-      <h1>Next Fauna GraphQL</h1>
-      <Link href="/new">
-        <a className={styles.link}>Create New Todo</a>
-      </Link>
+    <Fragment>
+      <Heading mb={3}>Next Fauna GraphQL</Heading>
+      <Button sx={{ cursor: 'pointer' }} onClick={() => router.push('/new')}>
+        Create New Todo
+      </Button>
+
       {data ? (
         <ul>
           {data.allTodos.data.map(todo => (
-            <li key={todo._id} className={styles.todo}>
+            <li sx={{ p: 1 }} key={todo._id}>
               <span
                 onClick={() => toggleTodo(todo._id, todo.completed)}
-                style={todo.completed ? { textDecoration: 'line-through' } : { textDecoration: 'none' }}
+                sx={{ textDecoration: todo.completed ? 'line-through' : 'none' }}
               >
                 {todo.task}
               </span>
-              <span className={styles.edit}>
-                <Link href="/todo/[id]" as={`/todo/${todo._id}`}>
-                  <a>Edit</a>
-                </Link>
+              <span
+                onClick={() => router.push('/todo/[id]', `/todo/${todo._id}`)}
+                sx={{
+                  cursor: 'pointer',
+                  color: 'primary',
+                  mx: 2,
+                  px: 2,
+                  borderRight: '1px solid #ccc',
+                  borderLeft: '1px solid #ccc',
+                }}
+              >
+                Edit
               </span>
-              <span onClick={() => deleteTodo(todo._id)} className={styles.delete}>
+              <span onClick={() => deleteTodo(todo._id)} sx={{ cursor: 'pointer', color: 'error' }}>
                 Delete
               </span>
             </li>
           ))}
         </ul>
       ) : (
-        <div>loading...</div>
+        <Text mt="3">Loading...</Text>
       )}
-    </Layout>
+    </Fragment>
   )
 }
 

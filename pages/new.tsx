@@ -1,12 +1,11 @@
+import { Alert, Box, Button, Heading, Input, Label, Message } from 'theme-ui'
+import { Fragment, useState } from 'react'
 import { GetServerSideProps } from 'next'
-import { useState } from 'react'
 import Router from 'next/router'
 import { gql } from 'graphql-request'
 import { useForm } from 'react-hook-form'
 import useSWR from 'swr'
 
-import Layout from '../components/layout'
-import utilStyles from '../styles/utils.module.css'
 import { graphQLClient } from '../utils/graphql-client'
 import { getAuthCookie } from '../utils/auth-cookies'
 
@@ -44,30 +43,26 @@ const New = ({ token }: Props) => {
   })
 
   return (
-    <Layout>
-      <h1>Create New Todo</h1>
-      <form onSubmit={onSubmit} className={utilStyles.form}>
-        <div>
-          <label htmlFor="task">Task</label>
-          <input type="text" name="task" placeholder="do something" ref={register({ required: 'Task is required' })} />
-          {errors.task && (
-            <span role="alert" className={utilStyles.error}>
-              {errors.task.message}
-            </span>
-          )}
-        </div>
+    <Fragment>
+      <Heading mb={3}>Create New Todo</Heading>
+      <Box as="form" onSubmit={onSubmit}>
+        <Box mb={3}>
+          <Label htmlFor="task">Task</Label>
+          <Input type="text" name="task" placeholder="do something" ref={register({ required: 'Task is required' })} />
+          {errors.task && <Alert variant="error">{errors.task.message}</Alert>}
+        </Box>
 
-        <div className={utilStyles.submit}>
-          <button type="submit">Create</button>
-        </div>
-      </form>
+        <Box sx={{ textAlign: 'right' }}>
+          <Button type="submit">Create</Button>
+        </Box>
+      </Box>
 
       {errorMessage && (
-        <p role="alert" className={utilStyles.errorMessage}>
+        <Message mt="3" variant="error">
           {errorMessage}
-        </p>
+        </Message>
       )}
-    </Layout>
+    </Fragment>
   )
 }
 

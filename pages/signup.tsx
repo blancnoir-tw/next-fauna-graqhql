@@ -1,16 +1,20 @@
-import { useState } from 'react'
+import { Alert, Box, Button, Heading, Input, Label, Message } from 'theme-ui'
+import { FC, Fragment, useState } from 'react'
 import { useRouter } from 'next/router'
 import { useForm } from 'react-hook-form'
 
-import Layout from '../components/layout'
-import utilStyles from '../styles/utils.module.css'
+type FormData = {
+  email: string
+  password: string
+  password2: string
+}
 
 const Signup = () => {
   const router = useRouter()
   const [errorMessage, setErrorMessage] = useState('')
   const { handleSubmit, register, watch, errors } = useForm()
 
-  const onSubmit = handleSubmit(async formData => {
+  const onSubmit = handleSubmit<FormData>(async formData => {
     if (errorMessage) setErrorMessage('')
 
     try {
@@ -32,65 +36,53 @@ const Signup = () => {
   })
 
   return (
-    <Layout>
-      <h1>Sign Up</h1>
-      <form onSubmit={onSubmit} className={utilStyles.form}>
-        <div>
-          <label htmlFor="email">Email</label>
-          <input
+    <Fragment>
+      <Heading mb={3}>Signup</Heading>
+      <Box as="form" onSubmit={onSubmit}>
+        <Box mb={3}>
+          <Label htmlFor="email">Email</Label>
+          <Input
             type="email"
             name="email"
             placeholder="john@example.com"
             ref={register({ required: 'Email is required' })}
           />
-          {errors.email && (
-            <span role="alert" className={utilStyles.error}>
-              {errors.email.message}
-            </span>
-          )}
-        </div>
+          {errors.email && <Alert variant="error">{errors.email.message}</Alert>}
+        </Box>
 
-        <div>
-          <label htmlFor="password">Password</label>
-          <input
+        <Box mb={3}>
+          <Label htmlFor="password">Password</Label>
+          <Input
             type="password"
             name="password"
             placeholder="John-1234"
             ref={register({ required: 'Password is required' })}
           />
-          {errors.password && (
-            <span role="alert" className={utilStyles.error}>
-              {errors.password.massage}
-            </span>
-          )}
-        </div>
+          {errors.password && <Alert variant="error">{errors.password.message}</Alert>}
+        </Box>
 
-        <div>
-          <label htmlFor="password2">Confirm Password</label>
-          <input
+        <Box mb={3}>
+          <Label htmlFor="password2">Confirm Password</Label>
+          <Input
             type="password"
             name="password2"
             placeholder="John-1234"
             ref={register({ validate: value => value === watch('password') || 'Password do not match' })}
           />
-          {errors.password2 && (
-            <span role="alert" className={utilStyles.error}>
-              {errors.password2.massage}
-            </span>
-          )}
-        </div>
+          {errors.password2 && <Alert variant="error">{errors.password2.message}</Alert>}
+        </Box>
 
-        <div className={utilStyles.submit}>
-          <button type="submit">Sign up</button>
-        </div>
-      </form>
+        <Box sx={{ textAlign: 'right' }}>
+          <Button type="submit">Signup</Button>
+        </Box>
+      </Box>
 
       {errorMessage && (
-        <p role="alert" className={utilStyles.errorMessage}>
+        <Message mt="3" variant="error">
           {errorMessage}
-        </p>
+        </Message>
       )}
-    </Layout>
+    </Fragment>
   )
 }
 

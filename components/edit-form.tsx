@@ -1,10 +1,10 @@
+import { Alert, Box, Button, Checkbox, Input, Label, Message } from 'theme-ui'
 import { useState, useEffect, Fragment } from 'react'
 import Router from 'next/router'
 import { gql } from 'graphql-request'
 import { useForm } from 'react-hook-form'
 
 import { Todo } from '../schema/schema'
-import utilStyles from '../styles/utils.module.css'
 import { graphQLClient } from '../utils/graphql-client'
 
 type Props = {
@@ -20,6 +20,10 @@ const EditForm = ({ defaultValues, id, token }: Props) => {
   const { handleSubmit, register, reset, errors } = useForm<FormData>({
     defaultValues: { ...defaultValues },
   })
+
+  useEffect(() => {
+    reset(defaultValues)
+  }, [reset, defaultValues])
 
   const onSubmit = handleSubmit(async ({ task, completed }) => {
     if (errorMessage) setErrorMessage('')
@@ -44,46 +48,31 @@ const EditForm = ({ defaultValues, id, token }: Props) => {
     }
   })
 
-  useEffect(() => {
-    reset(defaultValues)
-  }, [reset, defaultValues])
-
   return (
     <Fragment>
-      <form onSubmit={onSubmit} className={utilStyles.form}>
-        <div>
-          <label htmlFor="task">Task</label>
-          <input
-            type="text"
-            name="task"
-            ref={register({ required: 'Task is required' })}
-          />
-          {errors.task && (
-            <span role="alert" className={utilStyles.error}>
-              {errors.task.message}
-            </span>
-          )}
-        </div>
+      <Box as="form" onSubmit={onSubmit}>
+        <Box mb={3}>
+          <Label htmlFor="task">Task</Label>
+          <Input type="text" name="task" ref={register({ required: 'Task is required' })} />
+          {errors.task && <Alert variant="error">{errors.task.message}</Alert>}
+        </Box>
 
-        <div className={utilStyles.checkboxWrap}>
-          <label htmlFor="completed">Completed</label>
-          <input type="checkbox" name="completed" ref={register()} />
-          {errors.completed && (
-            <span role="alert" className={utilStyles.error}>
-              {errors.completed.message}
-            </span>
-          )}
-        </div>
+        <Box mb={3}>
+          <Label>
+            Completed
+            <Checkbox name="completed" ref={register()} />
+          </Label>
+        </Box>
 
-        <div className={utilStyles.submit}>
-          <button type="submit">Update</button>
-        </div>
-      </form>
+        <Box sx={{ textAlign: 'right' }}>
+          <Button type="submit">Update</Button>
+        </Box>
+      </Box>
 
       {errorMessage && (
-        <p role="alert" className={utilStyles.errorMessage}>
+        <Message mt="3" variant="error">
           {errorMessage}
-        </p>
+        </Message>
       )}
     </Fragment>
   )

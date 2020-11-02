@@ -1,9 +1,8 @@
-import Link from 'next/link'
+/** @jsxRuntime classic */
+/** @jsx jsx */
+import { Flex, Heading, jsx, NavLink } from 'theme-ui'
 import { useRouter } from 'next/router'
-import { Fragment } from 'react'
 import useSWR from 'swr'
-
-import styles from './header.module.css'
 
 const Header = () => {
   const router = useRouter()
@@ -20,44 +19,43 @@ const Header = () => {
     }
   }
 
-  return (
-    <div className={styles.header}>
-      <header>
-        <nav>
-          <Link href="/">
-            <a>Home</a>
-          </Link>
+  const renderNavLinks = () => {
+    const navLinks = user
+      ? [
+          { onClick: () => router.push('/profile'), text: user.email },
+          { onClick: logout, text: 'Logout' },
+        ]
+      : [
+          { onClick: () => router.push('/login'), text: 'Login' },
+          { onClick: () => router.push('/signup'), text: 'Signup' },
+        ]
 
-          <ul>
-            {user ? (
-              <Fragment>
-                <li>
-                  <Link href="/profile">
-                    <a>{user.email}</a>
-                  </Link>
-                </li>
-                <li>
-                  <button onClick={logout}>Logout</button>
-                </li>
-              </Fragment>
-            ) : (
-              <Fragment>
-                <li>
-                  <Link href="/login">
-                    <a>Login</a>
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/signup">
-                    <a>Signup</a>
-                  </Link>
-                </li>
-              </Fragment>
-            )}
-          </ul>
-        </nav>
-      </header>
-    </div>
+    return navLinks.map(({ onClick, text }, index) => (
+      <NavLink key={index} sx={{ ml: 2, p: 2 }} onClick={onClick}>
+        {text}
+      </NavLink>
+    ))
+  }
+
+  return (
+    <header sx={{ color: '#fff', background: '#333' }}>
+      <Flex
+        as="nav"
+        sx={{
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          maxWidth: theme => `${theme.sizes.container}`,
+          m: '0 auto',
+          p: 2,
+        }}
+      >
+        <Heading as="h1" sx={{ cursor: 'pointer', mr: 'auto' }} onClick={() => router.push('/')}>
+          Home
+        </Heading>
+
+        {renderNavLinks()}
+      </Flex>
+    </header>
   )
 }
 

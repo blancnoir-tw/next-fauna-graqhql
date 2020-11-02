@@ -1,27 +1,23 @@
+import { Heading, Text } from 'theme-ui'
+import { Fragment } from 'react'
+import { GetServerSideProps } from 'next'
 import { useRouter } from 'next/router'
 import useSWR from 'swr'
 import { gql } from 'graphql-request'
 
 import { Todo as ITodo } from '../../schema/schema'
-import Layout from '../../components/layout'
 import EditForm from '../../components/edit-form'
 import { graphQLClient } from '../../utils/graphql-client'
-import { GetServerSideProps } from 'next'
 import { getAuthCookie } from '../../utils/auth-cookies'
 
-type Response = {
-  findTodoByID: Omit<ITodo, '_id'>
-}
-
+type Response = { findTodoByID: Omit<ITodo, '_id'> }
 type Props = { token: string }
 
 const Todo = ({ token }: Props) => {
   const router = useRouter()
   const { id } = router.query
 
-  const fetcher = async (query: string) => {
-    return graphQLClient(token).request(query, { id })
-  }
+  const fetcher = async (query: string) => graphQLClient(token).request(query, { id })
 
   const query = gql`
     query FindTodoByID($id: ID!) {
@@ -34,22 +30,13 @@ const Todo = ({ token }: Props) => {
 
   const { data, error } = useSWR<Response, Error>([query, id], fetcher)
 
-  if (error) return <div>failed to load</div>
+  if (error) return <Text>failed to load</Text>
 
   return (
-    <Layout>
-      <h1>Edit Todo</h1>
-
-      {data ? (
-        <EditForm
-          defaultValues={data.findTodoByID}
-          id={id as string}
-          token={token}
-        />
-      ) : (
-        <div>loading...</div>
-      )}
-    </Layout>
+    <Fragment>
+      <Heading mb={3}>Edit Todo</Heading>
+      {data ? <EditForm defaultValues={data.findTodoByID} id={id as string} token={token} /> : <Text>loading...</Text>}
+    </Fragment>
   )
 }
 
